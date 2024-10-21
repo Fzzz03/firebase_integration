@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "741927282076",
+    "project_id": "final-ec753",
+    "storage_bucket": "final-ec753.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:741927282076:android:6f877f28718172afe95459",
+        "android_client_info": {
+          "package_name": "com.example.firebase_in"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_hAnWkPLQQzB_VBKgNaL4TOkpRvuRVh0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
