@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'input_field.dart';
 import 'reg.dart'; 
-import 'home_page.dart'; 
+import 'home_page.dart'; // Import the HomePage
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import 'package:google_sign_in/google_sign_in.dart'; // Import Google Sign-In
 
