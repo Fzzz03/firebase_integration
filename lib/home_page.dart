@@ -1,6 +1,7 @@
-// ignore_for_file: dead_code
+// ignore_for_file: dead_code, unused_import
 
 import 'package:flutter/material.dart';
+import 'zakat_welcome_screen.dart'; // Import your welcome page
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -123,52 +124,32 @@ class HomePage extends StatelessWidget {
 
   // Method to show the settings menu with nested options
   void _showSettingsMenu(BuildContext context) {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    Offset offset = renderBox.localToGlobal(Offset.zero); // Get the current position of the settings button
+
     showMenu(
       context: context,
-      position: RelativeRect.fromLTRB(100, 60, 0, 0), // Adjust position as needed
+      position: RelativeRect.fromLTRB(
+          offset.dx, offset.dy + 60, 0, 0), // Adjusted position
       items: [
         PopupMenuItem<String>(
           value: 'Theme',
-          child: ListTile(
-            title: const Text('Theme'),
+          child: const ListTile(
+            title: Text('Theme'),
           ),
         ),
         PopupMenuItem<String>(
           value: 'Privacy',
-          child: ListTile(
-            title: const Text('Privacy and Security'),
+          child: const ListTile(
+            title: Text('Privacy and Security'),
           ),
         ),
       ],
     ).then((value) {
       if (value == 'Theme') {
-        _showThemeMenu(context); // Show nested theme options
+        // You can implement theme selection in the future
       } else if (value == 'Privacy') {
         // Handle Privacy and Security option
-      }
-    });
-  }
-
-  // Method to show theme options
-  void _showThemeMenu(BuildContext context) {
-    showMenu(
-      context: context,
-      position: RelativeRect.fromLTRB(150, 110, 0, 0), // Adjust position as needed
-      items: [
-        PopupMenuItem<String>(
-          value: 'Dark',
-          child: const ListTile(title: Text('Dark')),
-        ),
-        PopupMenuItem<String>(
-          value: 'Light',
-          child: const ListTile(title: Text('Light')),
-        ),
-      ],
-    ).then((value) {
-      if (value == 'Dark') {
-        // Handle dark theme selection
-      } else if (value == 'Light') {
-        // Handle light theme selection
       }
     });
   }
@@ -178,7 +159,7 @@ class HomePage extends StatelessWidget {
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'Sign Out') {
-          // Handle Sign Out
+          _showLogoutConfirmation(context); // Show logout confirmation
         } else if (value == 'Edit Profile') {
           // Handle Edit Profile
         }
@@ -212,7 +193,6 @@ class HomePage extends StatelessWidget {
 
   // Method to build profile image (either user's picture or default icon)
   Widget _buildProfileImage() {
-    // You can replace this with logic that checks for the user's uploaded profile image
     bool hasProfilePicture = false; // Example logic
 
     if (hasProfilePicture) {
@@ -225,5 +205,32 @@ class HomePage extends StatelessWidget {
     } else {
       return const Icon(Icons.account_circle, size: 36, color: Colors.white); // Default profile icon
     }
+  }
+
+  // Method to show logout confirmation dialog
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout Confirmation'),
+          content: const Text('ARE YOU SURE YOU WANT TO LOG-OUT?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.pushReplacementNamed(context ,'/'); // Navigate to welcome page
+              },
+            ),
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
