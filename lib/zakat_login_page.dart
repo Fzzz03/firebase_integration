@@ -27,8 +27,35 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-      // Navigate to home page after login
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+
+      // Check if the email is verified
+      User? user = userCredential.user;
+      await user?.reload(); // Reload the user to get the latest info
+      user = FirebaseAuth.instance.currentUser; // Get the current user
+
+      if (user != null && user.emailVerified) {
+        // Navigate to home page after login if email is verified
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+      } else {
+        // Show a message if the email is not verified
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Email Verification Required'),
+              content: const Text('Please verify your email before logging in.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     } catch (e) {
       // Handle errors (e.g., show a Snackbar or AlertDialog)
       print("Login error: $e");
@@ -58,6 +85,16 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
     } catch (e) {
       // Handle errors (e.g., show a Snackbar or AlertDialog)
       print("Google sign-in error: $e");
+    }
+  }
+
+  // Forgot password function
+  Future<void> _resetPassword() async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password reset link sent!')));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
   }
 
@@ -155,6 +192,16 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                               ),
                             ),
                             const SizedBox(height: 20),
+
+                            // Forgot Password button
+                            TextButton(
+                              onPressed: _resetPassword, // Call reset password function
+                              child: const Text(
+                                'Forgot Password?',
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ),
+
                             TextButton(
                               onPressed: () {
                                 // Navigate to RegisterPage when the button is pressed
@@ -164,7 +211,9 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                                 );
                               },
                               child: const Text(
-                                'Create Account',
+                                "Don't Have A account? Register  ",
+                                
+                                
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
