@@ -8,6 +8,10 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen dimensions
+    final Size screenSize = MediaQuery.of(context).size;
+    final double appBarHeight = kToolbarHeight; // Default AppBar height
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -16,7 +20,7 @@ class HomePage extends StatelessWidget {
             Row(
               children: [
                 const Icon(Icons.home, color: Colors.white), // Home icon
-                const SizedBox(width: 8), // Space between icon and text
+                SizedBox(width: screenSize.width * 0.02), // Space between icon and text
                 const Text(
                   'HOME PAGE',
                   style: TextStyle(
@@ -27,7 +31,7 @@ class HomePage extends StatelessWidget {
               ],
             ),
             const Spacer(), // Pushes the list to the right
-            _buildHeaderList(), // The list with headings like Home, About, etc.
+            _buildHeaderList(screenSize), // The list with headings like Home, About, etc.
           ],
         ),
         backgroundColor: Theme.of(context).primaryColor,
@@ -41,18 +45,18 @@ class HomePage extends StatelessWidget {
   }
 
   // Widget to build the list in the header
-  Widget _buildHeaderList() {
+  Widget _buildHeaderList(Size screenSize) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center, // Center the list items
       children: [
         _HeaderItem(title: 'Home', icon: Icons.home), // Home item with icon
-        const SizedBox(width: 25), // Increased space between items
+        SizedBox(width: screenSize.width * 0.05), // Increased space between items
         _HeaderItem(title: 'About', icon: Icons.info), // About item with icon
-        const SizedBox(width: 25),
+        SizedBox(width: screenSize.width * 0.05),
         _HeaderItem(title: 'Explore', icon: Icons.explore), // Explore item with icon
-        const SizedBox(width: 25),
+        SizedBox(width: screenSize.width * 0.05),
         _HeaderItem(title: 'Wallet', icon: Icons.account_balance_wallet), // Wallet item with icon
-        const SizedBox(width: 25),
+        SizedBox(width: screenSize.width * 0.05),
         _HeaderItem(title: 'Notes', icon: Icons.note), // Notes item with icon
       ],
     );
