@@ -21,13 +21,15 @@ class HomePage extends StatelessWidget {
               children: [
                 const Icon(Icons.home, color: Colors.white), // Home icon
                 SizedBox(width: screenSize.width * 0.02), // Space between icon and text
-                const Text(
-                  'HOME PAGE',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                // Conditionally show the larger title for larger screens
+                if (screenSize.width > 600) // Adjust threshold as needed
+                  const Text(
+                    'HOME PAGE',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
               ],
             ),
             const Spacer(), // Pushes the list to the right
@@ -47,7 +49,7 @@ class HomePage extends StatelessWidget {
   // Widget to build the list in the header
   Widget _buildHeaderList(Size screenSize) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center, // Center the list items
+      mainAxisAlignment: MainAxisAlignment.start, // Start from the left corner
       children: [
         _HeaderItem(title: 'Home', icon: Icons.home), // Home item with icon
         SizedBox(width: screenSize.width * 0.05), // Increased space between items
