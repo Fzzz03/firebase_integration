@@ -1,4 +1,5 @@
-// ignore_for_file: dead_code, unused_import
+
+// ignore_for_file: dead_code, unused_import, unused_local_variable
 
 import 'package:flutter/material.dart';
 import 'zakat_welcome_screen.dart'; // Import your welcome page
