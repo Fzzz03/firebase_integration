@@ -11,19 +11,18 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Get screen dimensions
     final Size screenSize = MediaQuery.of(context).size;
-    final double appBarHeight = kToolbarHeight; // Default AppBar height
+
+    // Check if the screen is considered "small"
+    bool isSmallScreen = screenSize.width < 600;
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.home, color: Colors.white), // Home icon
-                SizedBox(width: screenSize.width * 0.02), // Space between icon and text
-                // Conditionally show the larger title for larger screens
-                if (screenSize.width > 600) // Adjust threshold as needed
+        title: isSmallScreen
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.home, color: Colors.white), // Home icon
+                  const SizedBox(width: 5),
                   const Text(
                     'HOME PAGE',
                     style: TextStyle(
@@ -31,14 +30,31 @@ class HomePage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
-              ],
-            ),
-            const Spacer(), // Pushes the list to the right
-            _buildHeaderList(screenSize), // The list with headings like Home, About, etc.
-          ],
-        ),
+                ],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.home, color: Colors.white), // Home icon
+                      const SizedBox(width: 5),
+                      const Text(
+                        'HOME PAGE',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(), // Pushes the list to the right
+                  _buildHeaderList(screenSize), // The list with headings like Home, About, etc.
+                ],
+              ),
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
+          _buildSettingsMenu(context, isSmallScreen), // Updated settings menu
           _buildProfileIcon(context), // Profile icon on the right corner
         ],
         leading: _buildMenuButton(context), // Menu button on the left side
@@ -47,20 +63,20 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Widget to build the list in the header
+  // Widget to build the list in the header (only for larger screens)
   Widget _buildHeaderList(Size screenSize) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start, // Start from the left corner
+      mainAxisAlignment: MainAxisAlignment.center, // Center the list items
       children: [
-        _HeaderItem(title: 'Home', icon: Icons.home), // Home item with icon
-        SizedBox(width: screenSize.width * 0.05), // Increased space between items
-        _HeaderItem(title: 'About', icon: Icons.info), // About item with icon
+        _HeaderItem(title: 'Home', icon: Icons.home),
         SizedBox(width: screenSize.width * 0.05),
-        _HeaderItem(title: 'Explore', icon: Icons.explore), // Explore item with icon
+        _HeaderItem(title: 'About', icon: Icons.info),
         SizedBox(width: screenSize.width * 0.05),
-        _HeaderItem(title: 'Wallet', icon: Icons.account_balance_wallet), // Wallet item with icon
+        _HeaderItem(title: 'Explore', icon: Icons.explore),
         SizedBox(width: screenSize.width * 0.05),
-        _HeaderItem(title: 'Notes', icon: Icons.note), // Notes item with icon
+        _HeaderItem(title: 'Wallet', icon: Icons.account_balance_wallet),
+        SizedBox(width: screenSize.width * 0.05),
+        _HeaderItem(title: 'Notes', icon: Icons.note),
       ],
     );
   }
@@ -69,26 +85,26 @@ class HomePage extends StatelessWidget {
   Widget _HeaderItem({required String title, required IconData icon}) {
     return Row(
       children: [
-        Icon(icon, color: Colors.white), // Icon for the header item
-        const SizedBox(width: 5), // Space between icon and text
+        Icon(icon, color: Colors.white),
+        const SizedBox(width: 5),
         Text(
           title,
           style: const TextStyle(
-            fontWeight: FontWeight.w500, // Less bold than "HOME PAGE"
-            color: Colors.white, // White text color
-            fontSize: 18, // Slightly smaller font size
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+            fontSize: 18,
           ),
         ),
       ],
     );
   }
 
-  // Method to build the menu button (top-left)
-  Widget _buildMenuButton(BuildContext context) {
+  // Updated Settings Menu to include removed header items for smaller screens
+  Widget _buildSettingsMenu(BuildContext context, bool isSmallScreen) {
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'Settings') {
-          _showSettingsMenu(context); // Show nested settings menu
+          _showSettingsMenu(context);
         } else if (value == 'Help') {
           // Handle Help option
         } else if (value == 'Contact Us') {
@@ -100,65 +116,117 @@ class HomePage extends StatelessWidget {
           const PopupMenuItem(
             value: 'Settings',
             child: ListTile(
-              leading: Icon(Icons.settings, color: Colors.black), // Gear icon for settings
+              leading: Icon(Icons.settings, color: Colors.black),
               title: Text('Settings'),
             ),
           ),
           const PopupMenuItem(
             value: 'Help',
             child: ListTile(
-              leading: Icon(Icons.help, color: Colors.black), // Help icon
+              leading: Icon(Icons.help, color: Colors.black),
               title: Text('Help'),
             ),
           ),
           const PopupMenuItem(
             value: 'Contact Us',
             child: ListTile(
-              leading: Icon(Icons.contact_mail, color: Colors.black), // Contact icon
+              leading: Icon(Icons.contact_mail, color: Colors.black),
+              title: Text('Contact Us'),
+            ),
+          ),
+          if (isSmallScreen) ...[
+            const PopupMenuDivider(),
+            const PopupMenuItem(
+              value: 'Home',
+              child: ListTile(
+                leading: Icon(Icons.home, color: Colors.black),
+                title: Text('Home'),
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'About',
+              child: ListTile(
+                leading: Icon(Icons.info, color: Colors.black),
+                title: Text('About'),
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'Explore',
+              child: ListTile(
+                leading: Icon(Icons.explore, color: Colors.black),
+                title: Text('Explore'),
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'Wallet',
+              child: ListTile(
+                leading: Icon(Icons.account_balance_wallet, color: Colors.black),
+                title: Text('Wallet'),
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'Notes',
+              child: ListTile(
+                leading: Icon(Icons.note, color: Colors.black),
+                title: Text('Notes'),
+              ),
+            ),
+          ],
+        ];
+      },
+      icon: const Icon(Icons.settings, color: Colors.white),
+      offset: const Offset(0, 58),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      color: Colors.white.withOpacity(0.9),
+    );
+  }
+
+  // Method to build the menu button (top-left)
+  Widget _buildMenuButton(BuildContext context) {
+    return PopupMenuButton<String>(
+      onSelected: (value) {
+        if (value == 'Settings') {
+          _showSettingsMenu(context);
+        } else if (value == 'Help') {
+          // Handle Help option
+        } else if (value == 'Contact Us') {
+          // Handle Contact Us option
+        }
+      },
+      itemBuilder: (BuildContext context) {
+        return [
+          const PopupMenuItem(
+            value: 'Settings',
+            child: ListTile(
+              leading: Icon(Icons.settings, color: Colors.black),
+              title: Text('Settings'),
+            ),
+          ),
+          const PopupMenuItem(
+            value: 'Help',
+            child: ListTile(
+              leading: Icon(Icons.help, color: Colors.black),
+              title: Text('Help'),
+            ),
+          ),
+          const PopupMenuItem(
+            value: 'Contact Us',
+            child: ListTile(
+              leading: Icon(Icons.contact_mail, color: Colors.black),
               title: Text('Contact Us'),
             ),
           ),
         ];
       },
-      icon: const Icon(Icons.menu, color: Colors.white), // Menu button icon
-      offset: const Offset(0, 58), // Offset to start the dropdown below the header
+      icon: const Icon(Icons.menu, color: Colors.white),
+      offset: const Offset(0, 58),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Rounded corners
+        borderRadius: BorderRadius.circular(10),
       ),
-      color: Colors.white.withOpacity(0.9), // Glass-like look with reduced opacity
+      color: Colors.white.withOpacity(0.9),
     );
-  }
-
-  // Method to show the settings menu with nested options
-  void _showSettingsMenu(BuildContext context) {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
-    Offset offset = renderBox.localToGlobal(Offset.zero); // Get the current position of the settings button
-
-    showMenu(
-      context: context,
-      position: RelativeRect.fromLTRB(
-          offset.dx, offset.dy + 60, 0, 0), // Adjusted position
-      items: [
-        PopupMenuItem<String>(
-          value: 'Theme',
-          child: const ListTile(
-            title: Text('Theme'),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'Privacy',
-          child: const ListTile(
-            title: Text('Privacy and Security'),
-          ),
-        ),
-      ],
-    ).then((value) {
-      if (value == 'Theme') {
-        // You can implement theme selection in the future
-      } else if (value == 'Privacy') {
-        // Handle Privacy and Security option
-      }
-    });
   }
 
   // Method to build the profile icon with dropdown (top-right)
@@ -166,7 +234,7 @@ class HomePage extends StatelessWidget {
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'Sign Out') {
-          _showLogoutConfirmation(context); // Show logout confirmation
+          _showLogoutConfirmation(context);
         } else if (value == 'Edit Profile') {
           // Handle Edit Profile
         }
@@ -176,41 +244,39 @@ class HomePage extends StatelessWidget {
           const PopupMenuItem(
             value: 'Sign Out',
             child: ListTile(
-              leading: Icon(Icons.logout, color: Colors.black), // Logout icon
+              leading: Icon(Icons.logout, color: Colors.black),
               title: Text('Sign Out'),
             ),
           ),
           const PopupMenuItem(
             value: 'Edit Profile',
             child: ListTile(
-              leading: Icon(Icons.edit, color: Colors.black), // Edit icon
+              leading: Icon(Icons.edit, color: Colors.black),
               title: Text('Edit Profile'),
             ),
           ),
         ];
       },
-      icon: _buildProfileImage(), // Either user's profile image or default icon
-      offset: const Offset(0, 58), // Offset to align dropdown below AppBar
+      icon: _buildProfileImage(),
+      offset: const Offset(0, 58),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Rounded corners for dropdown
+        borderRadius: BorderRadius.circular(10),
       ),
-      color: Colors.white.withOpacity(0.9), // Glass-like look with reduced opacity
+      color: Colors.white.withOpacity(0.9),
     );
   }
 
-  // Method to build profile image (either user's picture or default icon)
+  // Method to build profile image
   Widget _buildProfileImage() {
-    bool hasProfilePicture = false; // Example logic
+    bool hasProfilePicture = false;
 
     if (hasProfilePicture) {
       return const CircleAvatar(
-        backgroundImage: NetworkImage(
-          'https://example.com/profile_picture.jpg', // Replace with actual image URL
-        ),
-        radius: 18, // Profile image size
+        backgroundImage: NetworkImage('https://example.com/profile_picture.jpg'),
+        radius: 18,
       );
     } else {
-      return const Icon(Icons.account_circle, size: 36, color: Colors.white); // Default profile icon
+      return const Icon(Icons.account_circle, size: 36, color: Colors.white);
     }
   }
 
@@ -226,13 +292,13 @@ class HomePage extends StatelessWidget {
             TextButton(
               child: const Text('Yes'),
               onPressed: () {
-                Navigator.pushReplacementNamed(context ,'/'); // Navigate to welcome page
+                Navigator.pushReplacementNamed(context, '/');
               },
             ),
             TextButton(
               child: const Text('No'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -241,3 +307,4 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+
