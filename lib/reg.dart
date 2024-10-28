@@ -16,6 +16,10 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  
+  // Add state variables for password visibility
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   Future<void> register() async {
     if (passwordController.text != confirmPasswordController.text) {
@@ -115,18 +119,58 @@ class _RegisterPageState extends State<RegisterPage> {
                               controller: emailController,
                             ),
                             const SizedBox(height: 20),
-                            InputField(
-                              hintText: 'Password',
-                              icon: Icons.lock,
-                              obscureText: true,
-                              controller: passwordController,
+                            Stack(
+                              children: [
+                                InputField(
+                                  hintText: 'Password',
+                                  icon: Icons.lock,
+                                  obscureText: !_isPasswordVisible,
+                                  controller: passwordController,
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  child: IconButton(
+                                    icon: Icon(
+                                      _isPasswordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isPasswordVisible = !_isPasswordVisible;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 20),
-                            InputField(
-                              hintText: 'Confirm Password', // Confirm password field
-                              icon: Icons.lock_outline,
-                              obscureText: true,
-                              controller: confirmPasswordController,
+                            Stack(
+                              children: [
+                                InputField(
+                                  hintText: 'Confirm Password', // Confirm password field
+                                  icon: Icons.lock_outline,
+                                  obscureText: !_isConfirmPasswordVisible,
+                                  controller: confirmPasswordController,
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  child: IconButton(
+                                    icon: Icon(
+                                      _isConfirmPasswordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 30),
                             ElevatedButton(
@@ -140,7 +184,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               onPressed: register, // Call the register function
                               child: const Text(
-                                'Register',
+                                'Register Now',
                                 style: TextStyle(fontSize: 18, color: Colors.white),
                               ),
                             ),
