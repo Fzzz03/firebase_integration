@@ -19,6 +19,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final GoogleSignIn googleSignIn = GoogleSignIn(); // Initialize GoogleSignIn
+  bool _obscurePassword = true; // To toggle password visibility
 
   // Handle regular email/password login
   Future<void> login() async {
@@ -155,11 +156,28 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                               controller: emailController,
                             ),
                             const SizedBox(height: 20),
-                            InputField(
-                              hintText: 'Password',
-                              icon: Icons.lock,
-                              obscureText: true,
-                              controller: passwordController,
+                            // Password Field with Eye Icon
+                            Stack(
+                              alignment: Alignment.centerRight,
+                              children: [
+                                InputField(
+                                  hintText: 'Password',
+                                  icon: Icons.lock,
+                                  obscureText: _obscurePassword,
+                                  controller: passwordController,
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                    color: Colors.white, // Set icon color to white
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword; // Toggle visibility
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 30),
                             ElevatedButton(
@@ -197,7 +215,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                             TextButton(
                               onPressed: _resetPassword, // Call reset password function
                               child: const Text(
-                                'Forgotten Password?',
+                                'Forgot Password?',
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
@@ -211,9 +229,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                                 );
                               },
                               child: const Text(
-                                "Don't have an account? Register now.",
-                                
-                                
+                                "Don't Have A account? Register  ",
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
