@@ -1,7 +1,7 @@
-
 // ignore_for_file: dead_code, unused_import, unused_local_variable
 
 import 'package:flutter/material.dart';
+import 'profile_page.dart'; // Import your profile page
 import 'zakat_welcome_screen.dart'; // Import your welcome page
 
 class HomePage extends StatelessWidget {
@@ -9,181 +9,35 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get screen dimensions
-    final Size screenSize = MediaQuery.of(context).size;
-
-    // Check if the screen is considered "small"
-    bool isSmallScreen = screenSize.width < 600;
-
     return Scaffold(
       appBar: AppBar(
-        title: isSmallScreen
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.home, color: Colors.white), // Home icon
-                  const SizedBox(width: 5),
-                  const Text(
-                    'HOME PAGE',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.home, color: Colors.white), // Home icon
-                      const SizedBox(width: 5),
-                      const Text(
-                        'HOME PAGE',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Spacer(), // Pushes the list to the right
-                  _buildHeaderList(screenSize), // The list with headings like Home, About, etc.
-                ],
-              ),
-        backgroundColor: Theme.of(context).primaryColor,
-        actions: [
-          _buildSettingsMenu(context, isSmallScreen), // Updated settings menu
-          _buildProfileIcon(context), // Profile icon on the right corner
-        ],
-        leading: _buildMenuButton(context), // Menu button on the left side
-      ),
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-    );
-  }
-
-  // Widget to build the list in the header (only for larger screens)
-  Widget _buildHeaderList(Size screenSize) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center, // Center the list items
-      children: [
-        _HeaderItem(title: 'Home', icon: Icons.home),
-        SizedBox(width: screenSize.width * 0.05),
-        _HeaderItem(title: 'About', icon: Icons.info),
-        SizedBox(width: screenSize.width * 0.05),
-        _HeaderItem(title: 'Explore', icon: Icons.explore),
-        SizedBox(width: screenSize.width * 0.05),
-        _HeaderItem(title: 'Wallet', icon: Icons.account_balance_wallet),
-        SizedBox(width: screenSize.width * 0.05),
-        _HeaderItem(title: 'Notes', icon: Icons.note),
-      ],
-    );
-  }
-
-  // Custom Widget for each header item
-  Widget _HeaderItem({required String title, required IconData icon}) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white),
-        const SizedBox(width: 5),
-        Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-            fontSize: 18,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Updated Settings Menu to include removed header items for smaller screens
-  Widget _buildSettingsMenu(BuildContext context, bool isSmallScreen) {
-    return PopupMenuButton<String>(
-      onSelected: (value) {
-        if (value == 'Settings') {
-          _showSettingsMenu(context);
-        } else if (value == 'Help') {
-          // Handle Help option
-        } else if (value == 'Contact Us') {
-          // Handle Contact Us option
-        }
-      },
-      itemBuilder: (BuildContext context) {
-        return [
-          const PopupMenuItem(
-            value: 'Settings',
-            child: ListTile(
-              leading: Icon(Icons.settings, color: Colors.black),
-              title: Text('Settings'),
-            ),
-          ),
-          const PopupMenuItem(
-            value: 'Help',
-            child: ListTile(
-              leading: Icon(Icons.help, color: Colors.black),
-              title: Text('Help'),
-            ),
-          ),
-          const PopupMenuItem(
-            value: 'Contact Us',
-            child: ListTile(
-              leading: Icon(Icons.contact_mail, color: Colors.black),
-              title: Text('Contact Us'),
-            ),
-          ),
-          if (isSmallScreen) ...[
-            const PopupMenuDivider(),
-            const PopupMenuItem(
-              value: 'Home',
-              child: ListTile(
-                leading: Icon(Icons.home, color: Colors.black),
-                title: Text('Home'),
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'About',
-              child: ListTile(
-                leading: Icon(Icons.info, color: Colors.black),
-                title: Text('About'),
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'Explore',
-              child: ListTile(
-                leading: Icon(Icons.explore, color: Colors.black),
-                title: Text('Explore'),
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'Wallet',
-              child: ListTile(
-                leading: Icon(Icons.account_balance_wallet, color: Colors.black),
-                title: Text('Wallet'),
-              ),
-            ),
-            const PopupMenuItem(
-              value: 'Notes',
-              child: ListTile(
-                leading: Icon(Icons.note, color: Colors.black),
-                title: Text('Notes'),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.home, color: Colors.white),
+            const SizedBox(width: 5),
+            const Text(
+              'HOME PAGE',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
               ),
             ),
           ],
-        ];
-      },
-      icon: const Icon(Icons.settings, color: Colors.white),
-      offset: const Offset(0, 58),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        ),
+        backgroundColor: Theme.of(context).primaryColor,
+        leading: _buildMenuButton(context),
+        actions: [
+          _buildProfileIcon(context),
+        ],
       ),
-      color: Colors.white.withOpacity(0.9),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Center(
+        child: Text('Main Content'), // Placeholder for main content
+      ),
     );
   }
 
-  // Method to build the menu button (top-left)
   Widget _buildMenuButton(BuildContext context) {
     return PopupMenuButton<String>(
       onSelected: (value) {
@@ -218,6 +72,34 @@ class HomePage extends StatelessWidget {
               title: Text('Contact Us'),
             ),
           ),
+          const PopupMenuItem(
+            value: 'About',
+            child: ListTile(
+              leading: Icon(Icons.info, color: Colors.black),
+              title: Text('About'),
+            ),
+          ),
+          const PopupMenuItem(
+            value: 'Wallet',
+            child: ListTile(
+              leading: Icon(Icons.account_balance_wallet, color: Colors.black),
+              title: Text('Wallet'),
+            ),
+          ),
+          const PopupMenuItem(
+            value: 'Notes',
+            child: ListTile(
+              leading: Icon(Icons.note, color: Colors.black),
+              title: Text('Notes'),
+            ),
+          ),
+          const PopupMenuItem(
+            value: 'Explore',
+            child: ListTile(
+              leading: Icon(Icons.explore, color: Colors.black),
+              title: Text('Explore'),
+            ),
+          ),
         ];
       },
       icon: const Icon(Icons.menu, color: Colors.white),
@@ -229,14 +111,17 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Method to build the profile icon with dropdown (top-right)
   Widget _buildProfileIcon(BuildContext context) {
     return PopupMenuButton<String>(
       onSelected: (value) {
         if (value == 'Sign Out') {
           _showLogoutConfirmation(context);
         } else if (value == 'Edit Profile') {
-          // Handle Edit Profile
+          // Navigate to the Profile Page when "Edit Profile" is clicked
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ProfilePage()),
+          );
         }
       },
       itemBuilder: (BuildContext context) {
@@ -257,7 +142,7 @@ class HomePage extends StatelessWidget {
           ),
         ];
       },
-      icon: _buildProfileImage(),
+      icon: const Icon(Icons.account_circle, size: 36, color: Colors.white),
       offset: const Offset(0, 58),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
@@ -266,21 +151,30 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Method to build profile image
-  Widget _buildProfileImage() {
-    bool hasProfilePicture = false;
+  void _showSettingsMenu(BuildContext context) {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    Offset offset = renderBox.localToGlobal(Offset.zero);
 
-    if (hasProfilePicture) {
-      return const CircleAvatar(
-        backgroundImage: NetworkImage('https://example.com/profile_picture.jpg'),
-        radius: 18,
-      );
-    } else {
-      return const Icon(Icons.account_circle, size: 36, color: Colors.white);
-    }
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(offset.dx, offset.dy + 60, 0, 0),
+      items: [
+        const PopupMenuItem<String>(
+          value: 'Theme',
+          child: ListTile(
+            title: Text('Theme'),
+          ),
+        ),
+        const PopupMenuItem<String>(
+          value: 'Privacy',
+          child: ListTile(
+            title: Text('Privacy and Security'),
+          ),
+        ),
+      ],
+    );
   }
 
-  // Method to show logout confirmation dialog
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
       context: context,
@@ -307,4 +201,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
