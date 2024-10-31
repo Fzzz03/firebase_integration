@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'input_field.dart';
@@ -24,46 +22,86 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
   bool _obscurePassword = true; // To toggle password visibility
 
   // Handle regular email/password login
- Future<void> login() async {
-  try {
-    // Attempt to sign in with email and password
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+  Future<void> login() async {
+    try {
+      // Attempt to sign in with email and password
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
 
-      // Check if the email is verified
-      User? user = userCredential.user;
-      await user?.reload(); // Reload the user to get the latest info
-      user = FirebaseAuth.instance.currentUser; // Get the current user
+      // If login is successful, navigate to the home page
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)),
+      );
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context); // Close any dialog or loading indicator
 
-      if (user != null && user.emailVerified) {
-        // Navigate to home page after login if email is verified
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+      // Handle specific error messages using if statements
+      if (e.code == 'user-not-found') {
+        _showAlertDialog(
+          title: 'Login Failed',
+          content: 'No user found with that email. Please register first.',
+        );
+      } else if (e.code == 'wrong-password') {
+        _showAlertDialog(
+          title: 'Login Failed',
+          content: 'Incorrect password. Please try again.',
+        );
+      } else if (e.code == 'invalid-email') {
+        _showAlertDialog(
+          title: 'Login Failed',
+          content: 'The email address is not valid. Please check your email.',
+        );
+      } else if (e.code == 'user-disabled') {
+        _showAlertDialog(
+          title: 'Login Failed',
+          content: 'This user account has been disabled.',
+        );
+      } else if (e.code == 'too-many-requests') {
+        _showAlertDialog(
+          title: 'Login Failed',
+          content: 'Too many login attempts. Please try again later.',
+        );
+      } else if (e.code == 'invalid-credential') {
+        _showAlertDialog(
+          title: 'Login Failed',
+          content: 'The supplied credentials are incorrect or malformed.',
+        );
       } else {
-        // Show a message if the email is not verified
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Email Verification Required'),
-              content: const Text('Please verify your email before logging in.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
+        _showAlertDialog(
+          title: 'Login Failed',
+          content: 'Login error: ${e.message}',
         );
       }
     } catch (e) {
-      // Handle errors (e.g., show a Snackbar or AlertDialog)
-      print("Login error: $e");
+      _showAlertDialog(
+        title: 'An error occurred',
+        content: 'Something went wrong. Please try again later.',
+      );
     }
+  }
+
+  // Helper function to show an alert dialog
+  void _showAlertDialog({required String title, required String content}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // Handle Google sign-in
@@ -84,10 +122,12 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
         await FirebaseAuth.instance.signInWithCredential(credential);
 
         // Navigate to home page after Google sign-in
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)),
+        );
       }
     } catch (e) {
-      // Handle errors (e.g., show a Snackbar or AlertDialog)
       print("Google sign-in error: $e");
     }
   }
@@ -96,7 +136,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
   Future<void> _resetPassword() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password reset link sent!')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password reset link sent!')));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
@@ -159,7 +199,6 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                               controller: emailController,
                             ),
                             const SizedBox(height: 20),
-                            // Password Field with Eye Icon
                             Stack(
                               alignment: Alignment.centerRight,
                               children: [
@@ -172,11 +211,11 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                                 IconButton(
                                   icon: Icon(
                                     _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                                    color: Colors.white, // Set icon color to white
+                                    color: Colors.white,
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _obscurePassword = !_obscurePassword; // Toggle visibility
+                                      _obscurePassword = !_obscurePassword;
                                     });
                                   },
                                 ),
@@ -191,7 +230,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: login, // Call the login function
+                              onPressed: login,
                               child: const Text(
                                 'Login',
                                 style: TextStyle(fontSize: 18, color: Colors.white),
@@ -206,33 +245,29 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: googleSignInMethod, // Call the Google sign-in function
+                              onPressed: googleSignInMethod,
                               child: const Text(
                                 'Login with Google',
                                 style: TextStyle(fontSize: 18, color: Colors.white),
                               ),
                             ),
                             const SizedBox(height: 20),
-
-                            // Forgot Password button
                             TextButton(
-                              onPressed: _resetPassword, // Call reset password function
+                              onPressed: _resetPassword,
                               child: const Text(
                                 'Forgot Password?',
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
-
                             TextButton(
                               onPressed: () {
-                                // Navigate to RegisterPage when the button is pressed
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (context) => const RegisterPage()),
                                 );
                               },
                               child: const Text(
-                                "Don't Have A account? Register  ",
+                                "Don't Have A account? Register",
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),

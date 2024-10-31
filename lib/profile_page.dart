@@ -17,7 +17,7 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.arrow_back,
             color: Colors.white, // Use configurable color here
             size: 30, // Use configurable size here
@@ -38,12 +38,12 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           children: [
             // Profile Picture
-            CircleAvatar(
+            const CircleAvatar(
               radius: 70, // Circle size
               backgroundImage: NetworkImage(
                 'https://example.com/profile_picture.jpg', // Replace with actual user image URL
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.account_circle,
                 size: 80, // Size of default icon if no image is available
                 color: Colors.grey, // Grey color for default icon
@@ -71,9 +71,9 @@ class ProfilePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8), // Rounded corners
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 10), // Padding inside the input
-                child: TextField(
-                  style: const TextStyle(color: Colors.white), // White text for input
-                  decoration: const InputDecoration(
+                child: const TextField(
+                  style: TextStyle(color: Colors.white), // White text for input
+                  decoration: InputDecoration(
                     border: InputBorder.none, // No border
                     hintText: 'Enter your username',
                     hintStyle: TextStyle(color: Color.fromARGB(216, 255, 255, 255)), // Hint text color
@@ -103,10 +103,10 @@ class ProfilePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8), // Rounded corners
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 10), // Padding inside the input
-                child: TextField(
+                child: const TextField(
                   maxLines: 5, // Allow multiple lines for description
-                  style: const TextStyle(color: Colors.white), // White text for input
-                  decoration: const InputDecoration(
+                  style: TextStyle(color: Colors.white), // White text for input
+                  decoration: InputDecoration(
                     border: InputBorder.none, // No border
                     hintText: 'Enter your description here...',
                     hintStyle: TextStyle(color: Color.fromARGB(216, 255, 255, 255)), // Hint text color
@@ -136,9 +136,9 @@ class ProfilePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8), // Rounded corners
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 10), // Padding inside the input
-                child: TextField(
-                  style: const TextStyle(color: Colors.white), // White text for input
-                  decoration: const InputDecoration(
+                child: const TextField(
+                  style: TextStyle(color: Colors.white), // White text for input
+                  decoration: InputDecoration(
                     border: InputBorder.none, // No border
                     hintText: 'Enter tags (e.g., #ORPHAN #WIDOW #WAR_VICTIMS)',
                     hintStyle: TextStyle(color: Color.fromARGB(216, 255, 255, 255)), // Hint text color
