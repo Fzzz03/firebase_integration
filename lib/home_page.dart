@@ -5,7 +5,9 @@ import 'profile_page.dart'; // Import your profile page
 import 'zakat_welcome_screen.dart'; // Import your welcome page
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key, required bool showVerificationMessage});
+  const HomePage({super.key, required this.showVerificationMessage});
+
+  final bool showVerificationMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -34,17 +36,22 @@ class HomePage extends StatelessWidget {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
-          Center(
-            child: Text('Main Content'), // Placeholder for main content
+          // Use ListView for dynamic content
+          ListView(
+            children: [
+              Center(
+                child: Text('Main Content'), // Placeholder for main content
+              ),
+              // You can add more widgets here
+            ],
           ),
-          _buildVerificationMessage(context),
+          if (showVerificationMessage) _buildVerificationMessage(context),
         ],
       ),
     );
   }
 
   Widget _buildVerificationMessage(BuildContext context) {
-    // This is your message that will be shown at the bottom
     return Positioned(
       bottom: 0,
       left: 0,
@@ -67,12 +74,18 @@ class HomePage extends StatelessWidget {
   Widget _buildMenuButton(BuildContext context) {
     return PopupMenuButton<String>(
       onSelected: (value) {
-        if (value == 'Settings') {
-          _showSettingsMenu(context);
-        } else if (value == 'Help') {
-          // Handle Help option
-        } else if (value == 'Contact Us') {
-          // Handle Contact Us option
+        switch (value) {
+          case 'Settings':
+            _showSettingsMenu(context);
+            break;
+          case 'Help':
+            _showHelp(context);
+            break;
+          case 'Contact Us':
+            _showContactUs(context);
+            break;
+          default:
+            break;
         }
       },
       itemBuilder: (BuildContext context) {
@@ -143,7 +156,6 @@ class HomePage extends StatelessWidget {
         if (value == 'Sign Out') {
           _showLogoutConfirmation(context);
         } else if (value == 'Edit Profile') {
-          // Navigate to the Profile Page when "Edit Profile" is clicked
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const ProfilePage()),
@@ -198,6 +210,48 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showHelp(BuildContext context) {
+    // Placeholder for help functionality
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Help'),
+          content: const Text('This is the help section.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showContactUs(BuildContext context) {
+    // Placeholder for contact us functionality
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Contact Us'),
+          content: const Text('You can reach us at contact@domain.com'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
