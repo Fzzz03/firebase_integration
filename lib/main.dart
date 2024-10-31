@@ -29,7 +29,7 @@ class ZakatApp extends StatelessWidget {
       initialRoute: '/', // Define the initial route
       routes: {
         '/': (context) => const ZakatWelcomeScreen(), // Welcome screen route
-        '/home': (context) => const HomePage(), // Home page route
+        '/home': (context) => const HomePage(showVerificationMessage: false), // Home page route, provide a value for showVerificationMessage
         // You can add more routes here as needed
       },
     );
