@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'input_field.dart';
@@ -22,12 +24,13 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
   bool _obscurePassword = true; // To toggle password visibility
 
   // Handle regular email/password login
-  Future<void> login() async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+ Future<void> login() async {
+  try {
+    // Attempt to sign in with email and password
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
 
       // Check if the email is verified
       User? user = userCredential.user;
@@ -36,7 +39,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
 
       if (user != null && user.emailVerified) {
         // Navigate to home page after login if email is verified
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
       } else {
         // Show a message if the email is not verified
         showDialog(
@@ -93,7 +96,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
   Future<void> _resetPassword() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Password reset link sent!')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password reset link sent!')));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     }
