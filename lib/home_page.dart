@@ -5,7 +5,7 @@ import 'profile_page.dart'; // Import your profile page
 import 'zakat_welcome_screen.dart'; // Import your welcome page
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required bool showVerificationMessage});
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +32,34 @@ class HomePage extends StatelessWidget {
         ],
       ),
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Center(
-        child: Text('Main Content'), // Placeholder for main content
+      body: Stack(
+        children: [
+          Center(
+            child: Text('Main Content'), // Placeholder for main content
+          ),
+          _buildVerificationMessage(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerificationMessage(BuildContext context) {
+    // This is your message that will be shown at the bottom
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        color: Colors.blue,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: const Text(
+          'Please verify your email address to continue.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ),
       ),
     );
   }
