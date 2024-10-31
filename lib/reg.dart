@@ -68,8 +68,8 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
@@ -77,9 +77,8 @@ class _RegisterPageState extends State<RegisterPage> {
       User? user = userCredential.user;
       if (user != null) {
         await user.updateDisplayName(nameController.text.trim());
-        await user.sendEmailVerification();
 
-        // Show dialog box for verification email sent
+        // Show dialog box for verification email sent immediately
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -96,9 +95,13 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ],
           ),
-        ).then((_) {
-          checkVerificationStatus(user);
-        });
+        );
+
+        // Send email verification after showing the dialog
+        await user.sendEmailVerification();
+
+        // Check verification status
+        checkVerificationStatus(user);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -198,13 +201,15 @@ class _RegisterPageState extends State<RegisterPage> {
                             InputField(
                               hintText: 'Name',
                               icon: Icons.person,
-                              controller: nameController, onChanged: (password) {  },
+                              controller: nameController,
+                              onChanged: (password) {},
                             ),
                             const SizedBox(height: 20),
                             InputField(
                               hintText: 'Email',
                               icon: Icons.email,
-                              controller: emailController, onChanged: (password) {  },
+                              controller: emailController,
+                              onChanged: (password) {},
                             ),
                             const SizedBox(height: 20),
                             Stack(
@@ -213,7 +218,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   hintText: 'Password',
                                   icon: Icons.lock,
                                   obscureText: !_isPasswordVisible,
-                                  controller: passwordController, onChanged: (password) {  },
+                                  controller: passwordController,
+                                  onChanged: (password) {},
                                 ),
                                 Positioned(
                                   right: 0,
@@ -253,7 +259,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   hintText: 'Confirm Password',
                                   icon: Icons.lock_outline,
                                   obscureText: !_isConfirmPasswordVisible,
-                                  controller: confirmPasswordController, onChanged: (password) {  },
+                                  controller: confirmPasswordController,
+                                  onChanged: (password) {},
                                 ),
                                 Positioned(
                                   right: 0,
