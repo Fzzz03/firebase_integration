@@ -153,7 +153,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                             InputField(
                               hintText: 'Email',
                               icon: Icons.email,
-                              controller: emailController,
+                              controller: emailController, onChanged: (password) {  },
                             ),
                             const SizedBox(height: 20),
                             // Password Field with Eye Icon
@@ -164,7 +164,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                                   hintText: 'Password',
                                   icon: Icons.lock,
                                   obscureText: _obscurePassword,
-                                  controller: passwordController,
+                                  controller: passwordController, onChanged: (password) {  },
                                 ),
                                 IconButton(
                                   icon: Icon(
