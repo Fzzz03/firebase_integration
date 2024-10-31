@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'input_field.dart'; // Assuming you have a custom InputField widget
-import 'home_page.dart'; // Import the HomePage
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'input_field.dart';
+import 'home_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -16,14 +17,13 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
-  
-  // Add state variables for password visibility
+
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  Timer? _emailCheckTimer;
 
   Future<void> register() async {
     if (passwordController.text != confirmPasswordController.text) {
-      // Show an error if passwords do not match
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Passwords do not match!"),
@@ -39,13 +39,26 @@ class _RegisterPageState extends State<RegisterPage> {
         password: passwordController.text.trim(),
       );
 
-      // Update the display name of the user
-      await userCredential.user?.updateDisplayName(nameController.text.trim());
+      User? user = userCredential.user;
 
-      // Navigate to home page after successful registration
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+      if (user != null) {
+        await user.updateDisplayName(nameController.text.trim());
+
+        if (!user.emailVerified) {
+          await user.sendEmailVerification();
+          _showVerificationPopup(user.email!);
+
+          // Start periodic email verification check
+          _emailCheckTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
+            await user.reload();
+            if (user.emailVerified) {
+              _emailCheckTimer?.cancel();
+              _navigateToHomePage();
+            }
+          });
+        }
+      }
     } catch (e) {
-      // Handle errors (e.g., show a Snackbar or AlertDialog)
       print("Registration error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -54,6 +67,41 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       );
     }
+  }
+
+  void _showVerificationPopup(String email) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text("A verification email has been sent to $email. Please verify to proceed."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToHomePage() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => HomePage(
+          showVerificationMessage: true, // Pass flag to show verification message
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailCheckTimer?.cancel();
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -70,7 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
-                    Navigator.pop(context); // Navigate back
+                    Navigator.pop(context);
                   },
                 ),
               ),
@@ -108,7 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             const SizedBox(height: 30),
                             InputField(
-                              hintText: 'Name', // Name text field
+                              hintText: 'Name',
                               icon: Icons.person,
                               controller: nameController,
                             ),
@@ -149,7 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             Stack(
                               children: [
                                 InputField(
-                                  hintText: 'Confirm Password', // Confirm password field
+                                  hintText: 'Confirm Password',
                                   icon: Icons.lock_outline,
                                   obscureText: !_isConfirmPasswordVisible,
                                   controller: confirmPasswordController,
@@ -182,7 +230,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: register, // Call the register function
+                              onPressed: register,
                               child: const Text(
                                 'Register Now',
                                 style: TextStyle(fontSize: 18, color: Colors.white),
