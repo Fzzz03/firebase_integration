@@ -20,6 +20,41 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _isRegisterButtonEnabled = false;
+
+  // Password conditions
+  bool hasMinLength = false;
+  bool hasNumber = false;
+  bool hasSpecialChar = false;
+  bool hasUpperCase = false;
+
+  @override
+  void initState() {
+    super.initState();
+    passwordController.addListener(_validatePassword);
+  }
+
+  @override
+  void dispose() {
+    passwordController.removeListener(_validatePassword);
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  void _validatePassword() {
+    setState(() {
+      String password = passwordController.text;
+      hasMinLength = password.length >= 8;
+      hasNumber = password.contains(RegExp(r'\d'));
+      hasSpecialChar = password.contains(RegExp(r'[!@#\$&*~]'));
+      hasUpperCase = password.contains(RegExp(r'[A-Z]'));
+      _isRegisterButtonEnabled =
+          hasMinLength && hasNumber && hasSpecialChar && hasUpperCase;
+    });
+  }
 
   Future<void> register() async {
     if (passwordController.text != confirmPasswordController.text) {
@@ -32,40 +67,40 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // Show dialog immediately to notify the user
-    showDialog(
-      context: context,
-      barrierDismissible: false, // User must tap "OK" to proceed
-      builder: (context) => AlertDialog(
-        title: const Text("Verification Email Sent"),
-        content: const Text("A verification email has been sent to your email. Please verify to continue."),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
-
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
       User? user = userCredential.user;
-
       if (user != null) {
         await user.updateDisplayName(nameController.text.trim());
         await user.sendEmailVerification();
-        // Check verification status after sending verification email
-        checkVerificationStatus(user);
+
+        // Show dialog box for verification email sent
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text("Verification Email Sent"),
+            content: const Text(
+                "A verification email has been sent to your email. Please verify to continue."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        ).then((_) {
+          checkVerificationStatus(user);
+        });
       }
     } catch (e) {
-      print("Registration error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Registration error: $e"),
@@ -79,10 +114,8 @@ class _RegisterPageState extends State<RegisterPage> {
     await user.reload();
     user = FirebaseAuth.instance.currentUser!;
     if (user.emailVerified) {
-      // Navigate to the home page after verification
       navigateToHomePage();
     } else {
-      // Retry checking verification status after a delay
       Timer(const Duration(seconds: 3), () => checkVerificationStatus(user));
     }
   }
@@ -95,13 +128,20 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    confirmPasswordController.dispose();
-    super.dispose();
+  Widget buildPasswordCriteria(String text, bool conditionMet) {
+    return Row(
+      children: [
+        Icon(
+          conditionMet ? Icons.check_circle : Icons.cancel,
+          color: conditionMet ? Colors.green : Colors.red,
+        ),
+        const SizedBox(width: 8),
+        Text(text,
+            style: TextStyle(
+              color: conditionMet ? Colors.green : Colors.red,
+            )),
+      ],
+    );
   }
 
   @override
@@ -158,13 +198,13 @@ class _RegisterPageState extends State<RegisterPage> {
                             InputField(
                               hintText: 'Name',
                               icon: Icons.person,
-                              controller: nameController,
+                              controller: nameController, onChanged: (password) {  },
                             ),
                             const SizedBox(height: 20),
                             InputField(
                               hintText: 'Email',
                               icon: Icons.email,
-                              controller: emailController,
+                              controller: emailController, onChanged: (password) {  },
                             ),
                             const SizedBox(height: 20),
                             Stack(
@@ -173,7 +213,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   hintText: 'Password',
                                   icon: Icons.lock,
                                   obscureText: !_isPasswordVisible,
-                                  controller: passwordController,
+                                  controller: passwordController, onChanged: (password) {  },
                                 ),
                                 Positioned(
                                   right: 0,
@@ -194,13 +234,26 @@ class _RegisterPageState extends State<RegisterPage> {
                               ],
                             ),
                             const SizedBox(height: 20),
+                            // Password criteria
+                            buildPasswordCriteria(
+                                "Must contain at least 8 characters",
+                                hasMinLength),
+                            buildPasswordCriteria("Must contain at least one number",
+                                hasNumber),
+                            buildPasswordCriteria(
+                                "Must contain at least one special character",
+                                hasSpecialChar),
+                            buildPasswordCriteria(
+                                "Must contain at least one capital letter",
+                                hasUpperCase),
+                            const SizedBox(height: 20),
                             Stack(
                               children: [
                                 InputField(
                                   hintText: 'Confirm Password',
                                   icon: Icons.lock_outline,
                                   obscureText: !_isConfirmPasswordVisible,
-                                  controller: confirmPasswordController,
+                                  controller: confirmPasswordController, onChanged: (password) {  },
                                 ),
                                 Positioned(
                                   right: 0,
@@ -213,7 +266,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                     onPressed: () {
                                       setState(() {
-                                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                        _isConfirmPasswordVisible =
+                                            !_isConfirmPasswordVisible;
                                       });
                                     },
                                   ),
@@ -223,17 +277,20 @@ class _RegisterPageState extends State<RegisterPage> {
                             const SizedBox(height: 30),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).primaryColor,
+                                backgroundColor: _isRegisterButtonEnabled
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.grey,
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 16, horizontal: 60),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: register,
+                              onPressed: _isRegisterButtonEnabled ? register : null,
                               child: const Text(
                                 'Register Now',
-                                style: TextStyle(fontSize: 18, color: Colors.white),
+                                style:
+                                    TextStyle(fontSize: 18, color: Colors.white),
                               ),
                             ),
                           ],
