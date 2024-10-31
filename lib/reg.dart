@@ -20,7 +20,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-  Timer? _emailCheckTimer;
 
   Future<void> register() async {
     if (passwordController.text != confirmPasswordController.text) {
@@ -33,6 +32,24 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
+    // Show dialog immediately to notify the user
+    showDialog(
+      context: context,
+      barrierDismissible: false, // User must tap "OK" to proceed
+      builder: (context) => AlertDialog(
+        title: const Text("Verification Email Sent"),
+        content: const Text("A verification email has been sent to your email. Please verify to continue."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+
     try {
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
@@ -43,20 +60,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (user != null) {
         await user.updateDisplayName(nameController.text.trim());
-
-        if (!user.emailVerified) {
-          await user.sendEmailVerification();
-          _showVerificationPopup(user.email!);
-
-          // Start periodic email verification check
-          _emailCheckTimer = Timer.periodic(const Duration(seconds: 3), (timer) async {
-            await user.reload();
-            if (user.emailVerified) {
-              _emailCheckTimer?.cancel();
-              _navigateToHomePage();
-            }
-          });
-        }
+        await user.sendEmailVerification();
+        // Check verification status after sending verification email
+        checkVerificationStatus(user);
       }
     } catch (e) {
       print("Registration error: $e");
@@ -69,34 +75,28 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  void _showVerificationPopup(String email) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: Text("A verification email has been sent to $email. Please verify to proceed."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("OK"),
-          ),
-        ],
-      ),
-    );
+  Future<void> checkVerificationStatus(User user) async {
+    await user.reload();
+    user = FirebaseAuth.instance.currentUser!;
+    if (user.emailVerified) {
+      // Navigate to the home page after verification
+      navigateToHomePage();
+    } else {
+      // Retry checking verification status after a delay
+      Timer(const Duration(seconds: 3), () => checkVerificationStatus(user));
+    }
   }
 
-  void _navigateToHomePage() {
+  void navigateToHomePage() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => HomePage(
-          showVerificationMessage: true, // Pass flag to show verification message
-        ),
+        builder: (context) => const HomePage(showVerificationMessage: false),
       ),
     );
   }
 
   @override
   void dispose() {
-    _emailCheckTimer?.cancel();
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
