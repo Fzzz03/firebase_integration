@@ -36,7 +36,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
 
       if (user != null && user.emailVerified) {
         // Navigate to home page after login if email is verified
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)));
       } else {
         // Show a message if the email is not verified
         showDialog(
@@ -81,7 +81,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
         await FirebaseAuth.instance.signInWithCredential(credential);
 
         // Navigate to home page after Google sign-in
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)));
       }
     } catch (e) {
       // Handle errors (e.g., show a Snackbar or AlertDialog)
