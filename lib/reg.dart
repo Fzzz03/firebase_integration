@@ -192,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             const Text(
                               'Create your account',
                               style: TextStyle(
-                                fontSize: 28,
+                                fontSize: 24, // Reduced font size
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -297,7 +297,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               child: const Text(
                                 'Register Now',
                                 style:
-                                    TextStyle(fontSize: 18, color: Colors.white),
+                                    TextStyle(fontSize: 16, color: Colors.white), // Reduced font size
                               ),
                             ),
                           ],
