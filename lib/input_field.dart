@@ -4,21 +4,24 @@ class InputField extends StatelessWidget {
   final String hintText;
   final IconData icon;
   final bool obscureText;
-  final TextEditingController? controller; // Add this line
+  final TextEditingController? controller;
+  final Function(String)? onChanged; // Add this line
 
   const InputField({
     super.key,
     required this.hintText,
     required this.icon,
     this.obscureText = false,
-    this.controller, // Add this line
+    this.controller,
+    this.onChanged, // Add this line to the constructor
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller, // Use the controller here
+      controller: controller,
       obscureText: obscureText,
+      onChanged: onChanged, // Pass onChanged to the TextField here
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Colors.white),
         hintText: hintText,
@@ -35,3 +38,4 @@ class InputField extends StatelessWidget {
     );
   }
 }
+
