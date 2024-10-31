@@ -1,7 +1,8 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'input_field.dart';
-import 'reg.dart'; 
+import 'reg.dart';
 import 'home_page.dart'; // Import the HomePage
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import 'package:google_sign_in/google_sign_in.dart'; // Import Google Sign-In
@@ -24,55 +25,24 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
   // Handle regular email/password login
   Future<void> login() async {
     try {
-      // Attempt to sign in with email and password
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // If login is successful, navigate to the home page
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)),
       );
     } on FirebaseAuthException catch (e) {
-      // Handle specific error messages using if statements
-      if (e.code == 'user-not-found') {
-        _showAlertDialog(
-          title: 'Login Failed',
-          content: 'No user found with that email. Please register first.',
-        );
-      } else if (e.code == 'wrong-password') {
-        _showAlertDialog(
-          title: 'Login Failed',
-          content: 'Incorrect password. Please try again.',
-        );
-      } else if (e.code == 'invalid-email') {
-        _showAlertDialog(
-          title: 'Login Failed',
-          content: 'The email address is not valid. Please check your email.',
-        );
-      } else if (e.code == 'user-disabled') {
-        _showAlertDialog(
-          title: 'Login Failed',
-          content: 'This user account has been disabled.',
-        );
-      } else if (e.code == 'too-many-requests') {
-        _showAlertDialog(
-          title: 'Login Failed',
-          content: 'Too many login attempts. Please try again later.',
-        );
-      } else if (e.code == 'invalid-credential') {
-        _showAlertDialog(
-          title: 'Login Failed',
-          content: 'The supplied credentials are incorrect or malformed.',
-        );
-      } else {
-        _showAlertDialog(
-          title: 'Login Failed',
-          content: 'Login error: ${e.message}',
-        );
-      }
+      _showAlertDialog(
+        title: 'Login Failed',
+        content: e.code == 'user-not-found'
+            ? 'No user found with that email. Please register first.'
+            : e.code == 'wrong-password'
+                ? 'Incorrect password. Please try again.'
+                : 'Login error: ${e.message}',
+      );
     } catch (e) {
       _showAlertDialog(
         title: 'An error occurred',
@@ -92,7 +62,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('OK'),
             ),
@@ -105,26 +75,33 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
   // Handle Google sign-in
   Future<void> googleSignInMethod() async {
     try {
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (kIsWeb) {
+        // Web-specific Google sign-in
+        GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
-      if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        // Sign in with a popup on web
+        await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      } else {
+        // Mobile/desktop-specific Google sign-in
+        GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-        // Create a new credential
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
-          idToken: googleAuth.idToken,
-        );
+        if (googleUser != null) {
+          final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-        // Sign in to Firebase with the Google credential
-        await FirebaseAuth.instance.signInWithCredential(credential);
+          final credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          );
 
-        // Navigate to home page after Google sign-in
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)),
-        );
+          await FirebaseAuth.instance.signInWithCredential(credential);
+        }
       }
+
+      // Navigate to home page after Google sign-in
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)),
+      );
     } catch (e) {
       print("Google sign-in error: $e");
     }
@@ -154,7 +131,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
-                    Navigator.pop(context); // Navigate back
+                    Navigator.pop(context);
                   },
                 ),
               ),
