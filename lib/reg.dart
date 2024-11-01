@@ -20,23 +20,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-  bool _isRegisterButtonEnabled = false;
-
-  // Password conditions
-  bool hasMinLength = false;
-  bool hasNumber = false;
-  bool hasSpecialChar = false;
-  bool hasUpperCase = false;
 
   @override
   void initState() {
     super.initState();
-    passwordController.addListener(_validatePassword);
   }
 
   @override
   void dispose() {
-    passwordController.removeListener(_validatePassword);
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
@@ -44,19 +35,38 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  void _validatePassword() {
-    setState(() {
-      String password = passwordController.text;
-      hasMinLength = password.length >= 8;
-      hasNumber = password.contains(RegExp(r'\d'));
-      hasSpecialChar = password.contains(RegExp(r'[!@#\$&*~]'));
-      hasUpperCase = password.contains(RegExp(r'[A-Z]'));
-      _isRegisterButtonEnabled =
-          hasMinLength && hasNumber && hasSpecialChar && hasUpperCase;
-    });
+  bool isPasswordValid(String password) {
+    final hasMinLength = password.length >= 8;
+    final hasNumber = password.contains(RegExp(r'\d'));
+    final hasSpecialChar = password.contains(RegExp(r'[!@#\$&*~]'));
+    final hasUpperCase = password.contains(RegExp(r'[A-Z]'));
+    return hasMinLength && hasNumber && hasSpecialChar && hasUpperCase;
   }
 
   Future<void> register() async {
+    if (!isPasswordValid(passwordController.text)) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Password Requirements"),
+          content: const Text(
+            "Your password must:\n"
+            "- Contain at least 8 characters\n"
+            "- Include at least one number\n"
+            "- Include at least one special character\n"
+            "- Include at least one uppercase letter",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     if (passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -78,7 +88,6 @@ class _RegisterPageState extends State<RegisterPage> {
       if (user != null) {
         await user.updateDisplayName(nameController.text.trim());
 
-        // Show dialog box for verification email sent immediately
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -97,10 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         );
 
-        // Send email verification after showing the dialog
         await user.sendEmailVerification();
-
-        // Check verification status
         checkVerificationStatus(user);
       }
     } catch (e) {
@@ -128,22 +134,6 @@ class _RegisterPageState extends State<RegisterPage> {
       MaterialPageRoute(
         builder: (context) => const HomePage(showVerificationMessage: false),
       ),
-    );
-  }
-
-  Widget buildPasswordCriteria(String text, bool conditionMet) {
-    return Row(
-      children: [
-        Icon(
-          conditionMet ? Icons.check_circle : Icons.cancel,
-          color: conditionMet ? Colors.green : Colors.red,
-        ),
-        const SizedBox(width: 8),
-        Text(text,
-            style: TextStyle(
-              color: conditionMet ? Colors.green : Colors.red,
-            )),
-      ],
     );
   }
 
@@ -192,7 +182,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             const Text(
                               'Create your account',
                               style: TextStyle(
-                                fontSize: 24, // Reduced font size
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -240,19 +230,6 @@ class _RegisterPageState extends State<RegisterPage> {
                               ],
                             ),
                             const SizedBox(height: 20),
-                            // Password criteria
-                            buildPasswordCriteria(
-                                "Must contain at least 8 characters",
-                                hasMinLength),
-                            buildPasswordCriteria("Must contain at least one number",
-                                hasNumber),
-                            buildPasswordCriteria(
-                                "Must contain at least one special character",
-                                hasSpecialChar),
-                            buildPasswordCriteria(
-                                "Must contain at least one capital letter",
-                                hasUpperCase),
-                            const SizedBox(height: 20),
                             Stack(
                               children: [
                                 InputField(
@@ -284,20 +261,18 @@ class _RegisterPageState extends State<RegisterPage> {
                             const SizedBox(height: 30),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: _isRegisterButtonEnabled
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.grey,
+                                backgroundColor: Theme.of(context).primaryColor,
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 16, horizontal: 60),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: _isRegisterButtonEnabled ? register : null,
+                              onPressed: register,
                               child: const Text(
                                 'Register Now',
-                                style:
-                                    TextStyle(fontSize: 16, color: Colors.white), // Reduced font size
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white),
                               ),
                             ),
                           ],

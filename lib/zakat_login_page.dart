@@ -230,7 +230,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                             TextButton(
                               onPressed: _resetPassword,
                               child: const Text(
-                                'Forgot Password?',
+                                'Forgotten Password?',
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
@@ -242,7 +242,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                                 );
                               },
                               child: const Text(
-                                "Don't Have An Account? Register",
+                                "Don't have An account? Register now.",
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
