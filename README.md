@@ -7,7 +7,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/Fzzz03/firebase_integration)
 
 
-## 🚀 About the Project
+## About the Project
 
 The **Zakat Application** is in development to become a secure and transparent Zakat donation platform. Currently, the project has integrated **Firebase** for initial backend support, allowing us to manage authentication, user data and real-time updates. As we expand, blockchain and additional database functionality will enhance the transparency, global efficiency, traceability and security of Zakat transactions.
 
@@ -17,6 +17,11 @@ The **Zakat Application** is in development to become a secure and transparent Z
  
 - **Backend**:  
   ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white)
+
+  ## Current Features
+
+- **Firebase Authentication**: User login and management
+
   
 ## Table of Contents
 
