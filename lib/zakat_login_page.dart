@@ -242,7 +242,7 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                                 );
                               },
                               child: const Text(
-                                "Don't have An account? Register now.",
+                                "Don't have an account? Register now.",
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
