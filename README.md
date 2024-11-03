@@ -1,7 +1,23 @@
 # Zakat Application  
 
-A charitable platform designed to facilitate Zakat calculation and donations, helping to connect generous donors with those in need. This app is focused on supporting the Muslim community by ensuring that Zakat is calculated correctly and that donations reach deserving recipients.
+![GitHub stars](https://img.shields.io/github/stars/Fzzz03/firebase_integration?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Fzzz03/firebase_integration?style=social)
+![GitHub issues](https://img.shields.io/github/issues/Fzzz03/firebase_integration)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/Fzzz03/firebase_integration)
+![GitHub last commit](https://img.shields.io/github/last-commit/Fzzz03/firebase_integration)
 
+
+## 🚀 About the Project
+
+The **Zakat Application** is in development to become a secure and transparent Zakat donation platform. Currently, the project has integrated **Firebase** for initial backend support, allowing us to manage authentication, user data and real-time updates. As we expand, blockchain and additional database functionality will enhance the transparency, global efficiency, traceability and security of Zakat transactions.
+
+- **Languages & Frameworks**:   
+  ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)  
+  ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+ 
+- **Backend**:  
+  ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=white)
+  
 ## Table of Contents
 
 - [Features](#features)
