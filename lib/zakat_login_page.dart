@@ -21,28 +21,47 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final GoogleSignIn googleSignIn = GoogleSignIn(); // Initialize GoogleSignIn
   bool _obscurePassword = true; // To toggle password visibility
+  String? _passwordErrorMessage; // Holds password error message
 
   // Handle regular email/password login
   Future<void> login() async {
+    setState(() {
+      _passwordErrorMessage = null; // Reset error message before each login attempt
+    });
+
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)),
-      );
+      // Check if the user's email is verified
+      if (userCredential.user != null && userCredential.user!.emailVerified) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)),
+        );
+      } else {
+        // If email is not verified, log out and show alert
+        await FirebaseAuth.instance.signOut();
+        _showAlertDialog(
+          title: 'Email Verification Required',
+          content: 'Please verify your email by clicking on the link sent to your email address.',
+        );
+      }
     } on FirebaseAuthException catch (e) {
-      _showAlertDialog(
-        title: 'Login Failed',
-        content: e.code == 'user-not-found'
-            ? 'No user found with that email. Please register first.'
-            : e.code == 'wrong-password'
-                ? 'Incorrect password. Please try again.'
-                : 'Login error: ${e.message}',
-      );
+      if (e.code == 'wrong-password') {
+        setState(() {
+          _passwordErrorMessage = 'Incorrect password. Try again.';
+        });
+      } else {
+        _showAlertDialog(
+          title: 'Login Failed',
+          content: e.code == 'user-not-found'
+              ? 'No user found with that email. Please register first.'
+              : 'Login error: ${e.message}',
+        );
+      }
     } catch (e) {
       _showAlertDialog(
         title: 'An error occurred',
@@ -76,13 +95,9 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
   Future<void> googleSignInMethod() async {
     try {
       if (kIsWeb) {
-        // Web-specific Google sign-in
         GoogleAuthProvider googleProvider = GoogleAuthProvider();
-
-        // Sign in with a popup on web
         await FirebaseAuth.instance.signInWithPopup(googleProvider);
       } else {
-        // Mobile/desktop-specific Google sign-in
         GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
         if (googleUser != null) {
@@ -97,7 +112,6 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
         }
       }
 
-      // Navigate to home page after Google sign-in
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage(showVerificationMessage: false)),
@@ -177,11 +191,23 @@ class _ZakatLoginPageState extends State<ZakatLoginPage> {
                             Stack(
                               alignment: Alignment.centerRight,
                               children: [
-                                InputField(
-                                  hintText: 'Password',
-                                  icon: Icons.lock,
-                                  obscureText: _obscurePassword,
-                                  controller: passwordController,
+                                Column(
+                                  children: [
+                                    InputField(
+                                      hintText: 'Password',
+                                      icon: Icons.lock,
+                                      obscureText: _obscurePassword,
+                                      controller: passwordController,
+                                    ),
+                                    if (_passwordErrorMessage != null)
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          _passwordErrorMessage!,
+                                          style: const TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                                 IconButton(
                                   icon: Icon(
